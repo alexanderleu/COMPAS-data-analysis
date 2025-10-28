@@ -1,0 +1,49 @@
+import pandas as pd
+
+# Load the COMPAS dataset
+df = pd.read_csv(r"C:\Users\Schule\Downloads\compas-scores-two-years.csv")
+
+# Clean up data — include only relevant cases
+df = df[
+    (df['days_b_screening_arrest'] <= 30) &
+    (df['days_b_screening_arrest'] >= -30) &
+    (df['is_recid'] != -1) &
+    (df['c_charge_degree'] != 'O') &
+    (df['score_text'].isin(['Low', 'Medium', 'High']))
+    ]
+
+# Convert the risk score into binary prediction: "High risk" = Medium/High, "Low risk" = Low
+df['predicted_high_risk'] = df['score_text'].apply(lambda x: 1 if x in ['Medium', 'High'] else 0)
+
+# True outcome (1 = reoffended within two years)
+df['actual_recid'] = df['two_year_recid']
+
+# Group by race
+races = df['race'].unique()
+
+results = []
+
+for race in races:
+    subset = df[df['race'] == race]
+    TP = len(subset[(subset['predicted_high_risk'] == 1) & (subset['actual_recid'] == 1)])
+    FP = len(subset[(subset['predicted_high_risk'] == 1) & (subset['actual_recid'] == 0)])
+    TN = len(subset[(subset['predicted_high_risk'] == 0) & (subset['actual_recid'] == 0)])
+    FN = len(subset[(subset['predicted_high_risk'] == 0) & (subset['actual_recid'] == 1)])
+
+    FPR = FP / (FP + TN) if (FP + TN) > 0 else 0
+    FNR = FN / (FN + TP) if (FN + TP) > 0 else 0
+
+    results.append({
+        'race': race,
+        'False Positive Rate': round(FPR, 3),
+        'False Negative Rate': round(FNR, 3),
+        'Total Cases': len(subset)
+    })
+
+# Convert results into DataFrame for plotting
+error_rate_df = pd.DataFrame(results)
+
+# Save for visualization
+error_rate_df.to_csv("error_rate_parity_by_race.csv", index=False)
+
+print(error_rate_df)
