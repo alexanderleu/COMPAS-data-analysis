@@ -1,0 +1,32 @@
+import pandas as pd
+
+# === Step 1: Load dataset ===
+df = pd.read_csv(r"C:\Users\Schule\Downloads\compas-scores-two-years.csv")
+
+# === Step 2: Keep only relevant races and valid scores ===
+df = df[df['race'].isin(['African-American', 'Caucasian'])]
+df = df[df['decile_score'].notna()]  # Ensure valid scores
+
+# === Step 3: Group by race and COMPAS score (1–10) ===
+# Compute number of defendants and how many reoffended
+grouped = (
+    df.groupby(['race', 'decile_score'])
+      .agg(
+          total=('two_year_recid', 'count'),
+          reoffended=('two_year_recid', 'sum')
+      )
+      .reset_index()
+)
+
+# === Step 4: Compute likelihood of reoffending (empirical probability) ===
+grouped['likelihood_reoffend'] = (grouped['reoffended'] / grouped['total']).round(3)
+
+# === Step 5: Optional — percentage format for easier plotting or interpretation ===
+grouped['%_reoffend'] = (grouped['likelihood_reoffend'] * 100).round(2)
+
+# === Step 6: Display and export ===
+print(grouped)
+
+# Export to CSV for plotting later
+grouped.to_csv("compas_predictive_parity.csv", index=False)
+print("\nData saved to compas_predictive_parity.csv")
