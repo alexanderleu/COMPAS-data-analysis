@@ -3,7 +3,7 @@ import pandas as pd
 # Load the COMPAS dataset
 df = pd.read_csv(r"C:\Users\Schule\Downloads\compas-scores-two-years.csv")
 
-# Clean up data — include only relevant cases
+# include only relevant cases
 df = df[
     (df['days_b_screening_arrest'] <= 30) &
     (df['days_b_screening_arrest'] >= -30) &
@@ -12,7 +12,7 @@ df = df[
     (df['score_text'].isin(['Low', 'Medium', 'High']))
     ]
 
-# Convert the risk score into binary prediction: "High risk" = Medium/High, "Low risk" = Low
+# Make "High risk" = Medium/High, "Low risk" = Low
 df['predicted_high_risk'] = df['score_text'].apply(lambda x: 1 if x in ['Medium', 'High'] else 0)
 
 # True outcome (1 = reoffended within two years)
@@ -40,10 +40,7 @@ for race in races:
         'Total Cases': len(subset)
     })
 
-# Convert results into DataFrame for plotting
+# Convert results into DataFrame and save as Table A1
 error_rate_df = pd.DataFrame(results)
-
-# Save for visualization
-error_rate_df.to_csv("error_rate_parity_by_race.csv", index=False)
-
+error_rate_df.to_csv("Table A1", index=False)
 print(error_rate_df)
