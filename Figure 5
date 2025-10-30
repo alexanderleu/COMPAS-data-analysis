@@ -1,16 +1,16 @@
 import pandas as pd
 
-# Read the COMPAS dataset (ensure the file is in your working directory)
+# Read the COMPAS dataset 
 df = pd.read_csv(r"C:\Users\Schule\Downloads\compas-scores-two-years.csv")
 
 # Filter for only Caucasian and African-American groups
 subset = df[df['race'].isin(['Caucasian', 'African-American'])]
 
-# Calculate base rate (proportion that recidivated) for each group
+# Calculate base rate for each group
 base_rates = subset.groupby('race')['two_year_recid'].mean().reset_index()
 base_rates.columns = ['race', 'recidivism_base_rate']
 
-# Output to CSV file
-base_rates.to_csv('recidivism_base_rate_Caucasian_AfricanAmerican.csv', index=False)
+# Output and save as table A3
+base_rates.to_csv('Table A3.csv', index=False)
 
 print(base_rates)
