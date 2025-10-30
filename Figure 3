@@ -26,4 +26,4 @@ grouped['%_reoffend'] = (grouped['likelihood_reoffend'] * 100).round(2)
 
 # Display and export to Table A1
 print(grouped)
-grouped.to_csv("Table A1", index=False)
+grouped.to_csv("Table A1.csv", index=False)
