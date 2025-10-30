@@ -42,5 +42,5 @@ for race in races:
 
 # Convert results into DataFrame and save as Table A1
 error_rate_df = pd.DataFrame(results)
-error_rate_df.to_csv("Table A1", index=False)
+error_rate_df.to_csv("Table A1.csv", index=False)
 print(error_rate_df)
